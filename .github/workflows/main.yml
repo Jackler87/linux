@@ -7,6 +7,6 @@ jobs:
     steps: #steps of the job
     - uses: actions/checkout@v2 #checkout current branch to see changes and latest commits
     - name: install dependenices #custom action - name
-      run: sudo apt install #custom action - content of action
+      run: sudo apt install #custom action - content of action - executes shell commands (github actions are run by a small linux VM)
     - name: build kernel
       run: make defconfig && make -j `nproc`
