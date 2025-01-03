@@ -1,0 +1,12 @@
+name: kernel_build
+on: 
+  push
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install dependenices
+      run: sudo apt install
+    - name: build kernel
+      run: make defconfig && make -j `nproc`
