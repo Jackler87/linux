@@ -50,6 +50,7 @@ jobs:
       
     - name: Compile all C files
       run: |
+        make headers
         gcc -o cxl_tests \
           ./tools/testing/cxl/config_check.c \
           ./tools/testing/cxl/cxl_acpi_test.c \
