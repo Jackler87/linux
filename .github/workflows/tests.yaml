@@ -27,3 +27,4 @@ jobs:
        # make -C tools/testing/selftests run_tests
     - name: KUnitTest
       run: |
+        ./tools/testing/kunit/kunit.py run
