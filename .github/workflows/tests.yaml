@@ -20,9 +20,10 @@ jobs:
         ccache -M 5G  # Set cache size to 5GB
         export CC="ccache gcc"  # Use ccache with gcc
 
-    # Build kernel using make
-    - name: Build kernel
+   # - name: selftests
+    #  run: |
+     #   make headers  # Set default config
+      #  make -C tools/testing/selftests 
+       # make -C tools/testing/selftests run_tests
+    - name: KUnitTest
       run: |
-        make headers  # Set default config
-        make -C tools/testing/selftests 
-        make -C tools/testing/selftests run_tests
