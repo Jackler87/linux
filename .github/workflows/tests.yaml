@@ -10,16 +10,24 @@ jobs:
     steps:
     - uses: actions/checkout@v2  # checkout current branch to see changes and latest commits
 
+    - name: Cache ccache
+      uses: actions/cache@v2
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-
+
     # Install dependencies (like compilers, etc.)
     - name: Install dependencies
       run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
 
-    # Set up ccache (optional: configure cache size if needed)
+    
     - name: Configure ccache
       run: |
-        ccache -M 5G  # Set cache size to 5GB
-        export CC="ccache gcc"  # Use ccache with gcc
-
+        ccache -M 5G
+        export CC="ccache gcc"
+        
     # Build kernel using make
     - name: Build kernel
       run: |
