@@ -42,3 +42,31 @@ jobs:
           arch/x86/boot/bzImage
           System.map
           vmlinux
+
+    - name: Package kernel files for release
+      run: |
+        mkdir -p release
+        cp arch/x86/boot/bzImage release/vmlinuz
+        cp System.map release/System.map
+        cp vmlinux release/vmlinux
+        tar -czf release/kernel-files.tar.gz -C release .
+
+    - name: Create GitHub release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: "Kernel Build v${{ github.run_number }}"
+        draft: false
+        prerelease: false
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-release.outputs.upload_url }}
+        asset_path: release/kernel-files.tar.gz
+        asset_name: kernel-files.tar.gz
+        asset_content_type: application/gzip
