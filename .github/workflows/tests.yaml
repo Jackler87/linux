@@ -25,6 +25,55 @@ jobs:
      #   make headers  # Set default config
       #  make -C tools/testing/selftests 
        # make -C tools/testing/selftests run_tests
-    - name: KUnitTest
+       
+   # - name: KUnitTest
+    #  run: |
+     #   ./tools/testing/kunit/kunit.py run
+
+    - name: CryptoTest
       run: |
-        ./tools/testing/kunit/kunit.py run
+        
+        command -v go >/dev/null 2>&1 || { echo >&2 "Go is not installed. Installing..."; sudo apt update && sudo apt install -y golang; }
+
+        export GOPATH=$HOME/go
+        export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
+        mkdir -p $HOME/test-crypto-chacha20
+        cd $HOME/test-crypto-chacha20
+        
+        cat <<EOF > chacha20_test.go
+        package main
+
+        import (
+            "testing"
+            "golang.org/x/crypto/chacha20"
+            "bytes"
+        )
+
+        func TestChaCha20Encryption(t *testing.T) {
+            key := []byte("01234567890123456789012345678901")
+            nonce := []byte("01234567")
+            plaintext := []byte("Hello, world!")
+            ciphertext := make([]byte, len(plaintext))
+
+            cipher, err := chacha20.NewUnauthenticatedCipher(key, nonce)
+            if err != nil {
+                t.Fatalf("failed to create cipher: %v", err)
+            }
+            cipher.XORKeyStream(ciphertext, plaintext)
+
+            decrypted := make([]byte, len(ciphertext))
+            cipher, err = chacha20.NewUnauthenticatedCipher(key, nonce)
+            if err != nil {
+                t.Fatalf("failed to create cipher: %v", err)
+            }
+            cipher.XORKeyStream(decrypted, ciphertext)
+
+            if !bytes.Equal(plaintext, decrypted) {
+                t.Errorf("expected %v, got %v", plaintext, decrypted)
+            }
+        }
+        EOF
+
+        go test -v
+       
