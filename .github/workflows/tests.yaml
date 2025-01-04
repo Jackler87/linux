@@ -48,14 +48,18 @@ jobs:
         chmod +x ./tools/testing/cxl/mock_acpi.c
         chmod +x ./tools/testing/cxl/watermark.h
       
-    - name: TenCXLTests
+    - name: Compile all C files
       run: |
-        ./tools/testing/cxl/config_check.c
-        ./tools/testing/cxl/cxl_acpi_test.c
-        ./tools/testing/cxl/cxl_core_exports.c
-        ./tools/testing/cxl/cxl_core_test.c
-        ./tools/testing/cxl/cxl_mem_test.c
-        ./tools/testing/cxl/cxl_pmem_test.c
-        ./tools/testing/cxl/cxl_port_test.c
-        ./tools/testing/cxl/mock_acpi.c
-        ./tools/testing/cxl/watermark.h
+        gcc -o cxl_tests \
+          ./tools/testing/cxl/config_check.c \
+          ./tools/testing/cxl/cxl_acpi_test.c \
+          ./tools/testing/cxl/cxl_core_exports.c \
+          ./tools/testing/cxl/cxl_core_test.c \
+          ./tools/testing/cxl/cxl_mem_test.c \
+          ./tools/testing/cxl/cxl_pmem_test.c \
+          ./tools/testing/cxl/cxl_port_test.c \
+          ./tools/testing/cxl/mock_acpi.c
+
+    - name: Run cxl_tests
+      run: |
+          ./cxl_tests
