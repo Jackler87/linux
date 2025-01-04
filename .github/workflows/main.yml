@@ -38,6 +38,7 @@ jobs:
 
     - name: Copy kernel files to staging directory
       run: |
+        sleep(10)
         mkdir -p release
         cp arch/x86/boot/bzImage release/vmlinuz
         cp System.map release/System.map
