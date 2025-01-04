@@ -21,16 +21,22 @@ jobs:
     # Install dependencies (like compilers, etc.)
     - name: Install dependencies
       run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
-
     
-    - name: Configure ccache
-      run: |
-        ccache -M 5G
-        export CC="ccache gcc"
-        
     # Build kernel using make
-    - name: Build kernel
+    - name: selftests
       run: |
-        make headers  # Set default config
+        make headers
         make -C tools/testing/selftests 
         make -C tools/testing/selftests run_tests
+       
+    - name: KUnitTest
+      run: |
+        ./tools/testing/kunit/kunit.py run
+    - name: Set execute permissions for the test script
+      run: | 
+        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
+      
+    - name: CryptoTest
+      run: |
+        ./tools/testing/crypto/chacha20-s390/run-tests.sh
+  
