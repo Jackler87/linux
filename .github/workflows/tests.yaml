@@ -20,12 +20,12 @@ jobs:
 
     # Install dependencies (like compilers, etc.)
     - name: Install dependencies
-      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache linux-headers-$(uname -r)
+      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
     
     # Build kernel using make
     - name: selftests
       run: |
-        make headers  # Set default config
+        make headers
         make -C tools/testing/selftests 
         make -C tools/testing/selftests run_tests
        
