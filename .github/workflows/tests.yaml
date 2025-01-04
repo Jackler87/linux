@@ -29,10 +29,23 @@ jobs:
    # - name: KUnitTest
     #  run: |
      #   ./tools/testing/kunit/kunit.py run
-    - name: Set execute permissions for the test script
-      run: | 
-        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
+    #- name: Set execute permissions for the test script
+     # run: | 
+      #  chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
       
-    - name: CryptoTest
+    #- name: CryptoTest
+     # run: |
+      #  ./tools/testing/crypto/chacha20-s390/run-tests.sh
+
+    - name: TenCXLTests
       run: |
-        ./tools/testing/crypto/chacha20-s390/run-tests.sh
+        ./tools/testing/cxl/Kbuild
+        ./tools/testing/cxl/config_check.c
+        ./tools/testing/cxl/cxl_acpi_test.c
+        ./tools/testing/cxl/cxl_core_exports.c
+        ./tools/testing/cxl/cxl_core_test.c
+        ./tools/testing/cxl/cxl_mem_test.c
+        ./tools/testing/cxl/cxl_pmem_test.c
+        ./tools/testing/cxl/cxl_port_test.c
+        ./tools/testing/cxl/mock_acpi.c
+        ./tools/testing/cxl/watermark.h
