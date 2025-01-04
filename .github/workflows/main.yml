@@ -54,22 +54,12 @@ jobs:
         name: kernel-artifacts
         path: kernel-files.tar.gz
 
-    - name: Create GitHub release
-      uses: actions/create-release@v1
+    - name: GitHub Release
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SOURCE_NAME: ${{ steps.extract_names.outputs.SOURCE_NAME }}
+        SOURCE_BRANCH: ${{ steps.extract_names.outputs.SOURCE_BRANCH }}
+        SOURCE_TAG: v${{ github.run_number }}
       with:
-        tag_name: v${{ github.run_number }}
-        release_name: "Kernel Build v${{ github.run_number }}"
-        draft: false
-        prerelease: false
-
-    - name: Upload release assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: kernel-files.tar.gz
-        asset_name: kernel-files.tar.gz
-        asset_content_type: application/gzip
+        files: ./kernel.files.tar.gz
