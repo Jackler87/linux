@@ -36,5 +36,5 @@ jobs:
     - name: CryptoTest
       run: |
         ./tools/testing/crypto/chacha20-s390/run-tests.sh
-        make -C tools/testing/crypto/chacha20-s390/Makefile all
+        make -C tools/testing/crypto/chacha20-s390 all
       
