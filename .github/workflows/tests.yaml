@@ -36,31 +36,6 @@ jobs:
     #- name: CryptoTest
      # run: |
       #  ./tools/testing/crypto/chacha20-s390/run-tests.sh
-    - name: Set execute permissions for Kbuild
+    - name: fault-Injection
       run: |
-        chmod +x ./tools/testing/cxl/config_check.c
-        chmod +x ./tools/testing/cxl/cxl_acpi_test.c
-        chmod +x ./tools/testing/cxl/cxl_core_exports.c
-        chmod +x ./tools/testing/cxl/cxl_core_test.c
-        chmod +x ./tools/testing/cxl/cxl_mem_test.c
-        chmod +x ./tools/testing/cxl/cxl_pmem_test.c
-        chmod +x ./tools/testing/cxl/cxl_port_test.c
-        chmod +x ./tools/testing/cxl/mock_acpi.c
-        chmod +x ./tools/testing/cxl/watermark.h
-      
-    - name: Compile all C files
-      run: |
-        make headers
-        gcc -o cxl_tests \
-          ./tools/testing/cxl/config_check.c \
-          ./tools/testing/cxl/cxl_acpi_test.c \
-          ./tools/testing/cxl/cxl_core_exports.c \
-          ./tools/testing/cxl/cxl_core_test.c \
-          ./tools/testing/cxl/cxl_mem_test.c \
-          ./tools/testing/cxl/cxl_pmem_test.c \
-          ./tools/testing/cxl/cxl_port_test.c \
-          ./tools/testing/cxl/mock_acpi.c
-
-    - name: Run cxl_tests
-      run: |
-          ./cxl_tests
+        ./tools/testing/fault-injection/failcmd.sh
