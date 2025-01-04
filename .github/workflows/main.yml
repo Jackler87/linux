@@ -6,31 +6,39 @@ on:
 
 jobs:
   kernel:
-    runs-on: ubuntu-latest  # defines the distro GitHub uses as a VM
-    steps:  # steps of the job
-    - uses: actions/checkout@v2  # checkout current branch to see changes and latest commits
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
 
-    # Cache ccache directory
     - name: Cache ccache
       uses: actions/cache@v2
       with:
-        path: ~/.ccache  # location to cache ccache files
-        key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}  # Cache key based on the Makefile to invalidate on changes
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
         restore-keys: |
           ${{ runner.os }}-ccache-
 
-    # Install dependencies (like compilers, etc.)
     - name: Install dependencies
       run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
 
-    # Set up ccache (optional: configure cache size if needed)
     - name: Configure ccache
       run: |
-        ccache -M 5G  # Set cache size to 5GB (or whatever is appropriate for your project)
-        export CC="ccache gcc"  # Use ccache with gcc
+        ccache -M 5G
+        export CC="ccache gcc"
 
-    # Build kernel using make
     - name: Build kernel
       run: |
-        make defconfig  # Set default config
-        make -j$(nproc)  # Build the kernel using the available processors
+        make defconfig
+        make -j$(nproc)
+
+    - name: Verify build outputs
+      run: ls -R arch/x86/boot
+
+    - name: Upload compiled kernel artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kernel-artifacts
+        path: |
+          arch/x86/boot/bzImage
+          System.map
+          vmlinux
