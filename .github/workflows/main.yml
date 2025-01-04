@@ -1,7 +1,7 @@
 name: kernel_build
 on: 
-  push
-  workflow_dispatch
+  push:
+  workflow_dispatch:
 jobs:
   kernel:
     runs-on: ubuntu-latest #defines the distro github uses as vm
