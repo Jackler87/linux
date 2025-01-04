@@ -1,19 +1,36 @@
 name: kernel_build
-on: 
+
+on:
   push:
   workflow_dispatch:
+
 jobs:
   kernel:
-    runs-on: ubuntu-latest #defines the distro github uses as vm
-    steps: #steps of the job
-    - uses: actions/checkout@v2 #checkout current branch to see changes and latest commits
-    - name: Load ccache
+    runs-on: ubuntu-latest  # defines the distro GitHub uses as a VM
+    steps:  # steps of the job
+    - uses: actions/checkout@v2  # checkout current branch to see changes and latest commits
+
+    # Cache ccache directory
+    - name: Cache ccache
       uses: actions/cache@v2
       with:
-        path: ~/.ccache
-        key:  ${{ runners.os }}
-    - name: install dependenices #custom action - name
-      #install packages for kernel build like c compiler etc. 
-      run: sudo apt install bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils #custom action - content of action - executes shell commands (github actions are run by a small linux VM)
-    - name: build kernel
-      run: make defconfig && make -j `nproc`
+        path: ~/.ccache  # location to cache ccache files
+        key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}  # Cache key based on the Makefile to invalidate on changes
+        restore-keys: |
+          ${{ runner.os }}-ccache-
+
+    # Install dependencies (like compilers, etc.)
+    - name: Install dependencies
+      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
+
+    # Set up ccache (optional: configure cache size if needed)
+    - name: Configure ccache
+      run: |
+        ccache -M 5G  # Set cache size to 5GB (or whatever is appropriate for your project)
+        export CC="ccache gcc"  # Use ccache with gcc
+
+    # Build kernel using make
+    - name: Build kernel
+      run: |
+        make defconfig  # Set default config
+        make -j$(nproc)  # Build the kernel using the available processors
