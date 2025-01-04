@@ -36,6 +36,9 @@ jobs:
     #- name: CryptoTest
      # run: |
       #  ./tools/testing/crypto/chacha20-s390/run-tests.sh
-    - name: fault-Injection
-      run: |
-        sudo ./tools/testing/fault-injection/failcmd.sh
+      
+    - name: Set execute permissions for failcmd.sh
+      run: chmod +x ./tools/testing/fault-injection/failcmd.sh
+
+    - name: Run failcmd.sh
+      run: sudo ./tools/testing/fault-injection/failcmd.sh
