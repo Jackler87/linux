@@ -11,7 +11,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.ccache
-        key:  ${{ matrix.defconfig }}
+        key:  ${{ runners.os }}
     - name: install dependenices #custom action - name
       #install packages for kernel build like c compiler etc. 
       run: sudo apt install bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils #custom action - content of action - executes shell commands (github actions are run by a small linux VM)
