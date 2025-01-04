@@ -8,7 +8,8 @@ jobs:
   kernel:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout source
+      uses: actions/checkout@v2
 
     - name: Cache ccache
       uses: actions/cache@v2
@@ -34,15 +35,6 @@ jobs:
     - name: Verify build outputs
       run: ls -R arch/x86/boot
 
-    - name: Upload compiled kernel artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: kernel-artifacts
-        path: |
-          arch/x86/boot/bzImage
-          System.map
-          vmlinux
-
     - name: Package kernel files for release
       run: |
         mkdir -p release
@@ -50,6 +42,12 @@ jobs:
         cp System.map release/System.map
         cp vmlinux release/vmlinux
         tar -czf release/kernel-files.tar.gz -C release .
+
+    - name: Upload compiled kernel artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kernel-artifacts
+        path: release/kernel-files.tar.gz
 
     - name: Create GitHub release
       uses: actions/create-release@v1
