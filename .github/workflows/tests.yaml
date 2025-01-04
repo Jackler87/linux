@@ -38,4 +38,4 @@ jobs:
       #  ./tools/testing/crypto/chacha20-s390/run-tests.sh
     - name: fault-Injection
       run: |
-        ./tools/testing/fault-injection/failcmd.sh
+        sudo ./tools/testing/fault-injection/failcmd.sh
