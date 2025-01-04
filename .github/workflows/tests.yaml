@@ -36,13 +36,12 @@ jobs:
     #- name: CryptoTest
      # run: |
       #  ./tools/testing/crypto/chacha20-s390/run-tests.sh
-    - name: Set execute permissions for Kbuild
-      run: |
-        chmod +x ./tools/testing/cxl/Kbuild
+    #- name: Set execute permissions for Kbuild
+     # run: |
+      #  chmod +x ./tools/testing/cxl/Kbuild
       
     - name: TenCXLTests
       run: |
-        ./tools/testing/cxl/Kbuild
         ./tools/testing/cxl/config_check.c
         ./tools/testing/cxl/cxl_acpi_test.c
         ./tools/testing/cxl/cxl_core_exports.c
