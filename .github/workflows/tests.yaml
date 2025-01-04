@@ -6,33 +6,19 @@ on:
 
 jobs:
   kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # defines the distro GitHub uses as a VM
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2  # checkout current branch to see changes and latest commits
 
+    # Install dependencies (like compilers, etc.)
     - name: Install dependencies
-      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache linux-headers-$(uname -r)
+      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
 
+    # Set up ccache (optional: configure cache size if needed)
     - name: Configure ccache
       run: |
-        ccache -M 5G
-        export CC="ccache gcc"
-
-    - name: Set execute permissions for the test script
-      run: chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
-
-    - name: Build Kernel Module
-      run: |
-        cd tools/testing/crypto/chacha20-s390
-        make -C /lib/modules/$(uname -r)/build/ M=$(pwd) modules
-
-    - name: Run CryptoTest
-      run: ./tools/testing/crypto/chacha20-s390/run-tests.sh
-
-    - name: Clean Build Artifacts
-      run: |
-        cd tools/testing/crypto/chacha20-s390
-        make -C /lib/modules/$(uname -r)/build/ M=$(pwd) clean
+        ccache -M 5G  # Set cache size to 5GB
+        export CC="ccache gcc"  # Use ccache with gcc
 
    # - name: selftests
     #  run: |
@@ -43,5 +29,11 @@ jobs:
    # - name: KUnitTest
     #  run: |
      #   ./tools/testing/kunit/kunit.py run
-   
+    - name: Set execute permissions for the test script
+      run: | 
+        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
+      
+    - name: CryptoTest
+      run: |
+        ./tools/testing/crypto/chacha20-s390/run-tests.sh
       
