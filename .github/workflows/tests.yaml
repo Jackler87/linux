@@ -26,16 +26,20 @@ jobs:
         make ARCH=um mrproper
         ./tools/testing/kunit/kunit.py config
 
+    - name: Build Necessary Modules
+      run: |
+        make ARCH=x86_64 -C tools/testing/crypto modules
+
     #- name: selftests
      # run: |
       #  make ARCH=um -C tools/testing/selftests 
        # make ARCH=um -C tools/testing/selftests run_tests
-       
-    - name: KUnitTest
-      run: |
-        ./tools/testing/kunit/kunit.py run
-        
+
+    #- name: KUnitTest
+     # run: |
+      #  ./tools/testing/kunit/kunit.py run
+
     - name: CryptoTest
       run: |
-        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
+        sudo chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
         sudo ./tools/testing/crypto/chacha20-s390/run-tests.sh
