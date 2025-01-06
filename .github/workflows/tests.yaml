@@ -21,13 +21,10 @@ jobs:
     - name: Install dependencies
       run: sudo apt install -y build-essential libncurses5-dev libssl-dev bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache dpkg-dev uml-utilities
 
-    - name: Prepare Kernel Headers
+    - name: Clean and Prepare Build
       run: |
         make ARCH=um mrproper
-        make ARCH=um headers_install
-
-    - name: Configure KUnit
-      run: ./tools/testing/kunit/kunit.py config
+        ./tools/testing/kunit/kunit.py config
 
     # - name: selftests
     #   run: |
@@ -37,7 +34,7 @@ jobs:
     - name: KUnitTest
       run: |
         ./tools/testing/kunit/kunit.py run
-
+        
     - name: CryptoTest
       run: |
         chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
