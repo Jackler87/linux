@@ -21,27 +21,30 @@ jobs:
     - name: Install dependencies
       run: sudo apt install -y build-essential libncurses5-dev libssl-dev bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache dpkg-dev uml-utilities
 
-    - name: Clean and Prepare Build
+    - name: Clean and Configure Kernel
       run: |
-        make ARCH=um mrproper
-        ./tools/testing/kunit/kunit.py config
-
-    - name: Build Kernel and Modules
+        make mrproper
+        make ARCH=x86_64 defconfig  # Nutze die Basis-Konfiguration, um Module einzuschalten
+        
+    - name: Compile Kernel and Modules
       run: |
-        make ARCH=x86_64 olddefconfig
-        make ARCH=x86_64 modules_prepare
-        make ARCH=x86_64 M=./tools/testing/selftests
+        make -j$(nproc) ARCH=x86_64
+        make -j$(nproc) ARCH=x86_64 modules INSTALL_MOD_PATH=./modules-out
 
-    #- name: selftests
-      #run: |
-      #  make ARCH=um -C tools/testing/selftests 
-     #   make ARCH=um -C tools/testing/selftests run_tests
+    - name: Install Modules
+      run: |
+        sudo make ARCH=x86_64 modules_install
 
-  #  - name: KUnitTest
-   #   run: |
-    #    ./tools/testing/kunit/kunit.py run
+    - name: Run selftests
+      run: |
+        make ARCH=um -C tools/testing/selftests
+        make ARCH=um -C tools/testing/selftests run_tests
 
-    - name: CryptoTest
+    - name: Run KUnitTest
+      run: |
+        ./tools/testing/kunit/kunit.py run
+
+    - name: Run CryptoTest
       run: |
         sudo chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
         sudo ./tools/testing/crypto/chacha20-s390/run-tests.sh
