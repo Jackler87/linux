@@ -23,21 +23,21 @@ jobs:
 
     - name: Prepare Kernel Headers
       run: |
-        make mrproper
-        make headers_install
+        make ARCH=um mrproper
+        make ARCH=um headers_install
 
     - name: Configure KUnit
       run: ./tools/testing/kunit/kunit.py config
 
-    #- name: selftests
-     # run: |
-      #  make -C tools/testing/selftests 
-       # make -C tools/testing/selftests run_tests
+    # - name: selftests
+    #   run: |
+    #     make ARCH=um -C tools/testing/selftests 
+    #     make ARCH=um -C tools/testing/selftests run_tests
        
     - name: KUnitTest
       run: |
         ./tools/testing/kunit/kunit.py run
-        
+
     - name: CryptoTest
       run: |
         chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
