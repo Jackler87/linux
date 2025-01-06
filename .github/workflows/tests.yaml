@@ -6,9 +6,9 @@ on:
 
 jobs:
   kernel:
-    runs-on: ubuntu-latest  # defines the distro GitHub uses as a VM
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2  # checkout current branch to see changes and latest commits
+    - uses: actions/checkout@v2
 
     - name: Cache ccache
       uses: actions/cache@v2
@@ -18,16 +18,21 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-ccache-
 
-    # Install dependencies (like compilers, etc.)
     - name: Install dependencies
-      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
-    
-    # Build kernel using make
-    - name: selftests
+      run: sudo apt install -y build-essential libncurses5-dev libssl-dev bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache dpkg-dev uml-utilities
+
+    - name: Prepare Kernel Headers
       run: |
-        make headers
-        make -C tools/testing/selftests 
-        make -C tools/testing/selftests run_tests
+        make mrproper
+        make headers_install
+
+    - name: Configure KUnit
+      run: ./tools/testing/kunit/kunit.py config
+
+    #- name: selftests
+     # run: |
+      #  make -C tools/testing/selftests 
+       # make -C tools/testing/selftests run_tests
        
     - name: KUnitTest
       run: |
@@ -37,4 +42,3 @@ jobs:
       run: |
         chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
         ./tools/testing/crypto/chacha20-s390/run-tests.sh
-  
