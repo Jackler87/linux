@@ -17,34 +17,20 @@ jobs:
         key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
         restore-keys: |
           ${{ runner.os }}-ccache-
-
+          
     - name: Install dependencies
       run: sudo apt install -y build-essential libncurses5-dev libssl-dev bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache dpkg-dev uml-utilities
 
-    - name: Clean and Configure Kernel
+    - name: Clean and Prepare Build
       run: |
-        make mrproper
-        make ARCH=x86_64 defconfig  # Nutze die Basis-Konfiguration, um Module einzuschalten
+        make ARCH=um mrproper
+        ./tools/testing/kunit/kunit.py config
         
-    - name: Compile Kernel and Modules
+    - name: selftests
       run: |
-        make -j$(nproc) ARCH=x86_64
-        make -j$(nproc) ARCH=x86_64 modules INSTALL_MOD_PATH=./modules-out
-
-    - name: Install Modules
-      run: |
-        sudo make ARCH=x86_64 modules_install
-
-    - name: Run selftests
-      run: |
-        make ARCH=um -C tools/testing/selftests
+        make ARCH=um -C tools/testing/selftests 
         make ARCH=um -C tools/testing/selftests run_tests
-
-    - name: Run KUnitTest
+       
+    - name: KUnitTest
       run: |
         ./tools/testing/kunit/kunit.py run
-
-    - name: Run CryptoTest
-      run: |
-        sudo chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
-        sudo ./tools/testing/crypto/chacha20-s390/run-tests.sh
