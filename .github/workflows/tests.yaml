@@ -26,18 +26,20 @@ jobs:
         make ARCH=um mrproper
         ./tools/testing/kunit/kunit.py config
 
-    - name: Build Necessary Modules
+    - name: Build Kernel and Modules
       run: |
-        make ARCH=x86_64 -C tools/testing/crypto modules
+        make ARCH=x86_64 olddefconfig
+        make ARCH=x86_64 modules_prepare
+        make ARCH=x86_64 M=./tools/testing/selftests
 
-    #- name: selftests
-     # run: |
-      #  make ARCH=um -C tools/testing/selftests 
-       # make ARCH=um -C tools/testing/selftests run_tests
+    - name: selftests
+      run: |
+        make ARCH=um -C tools/testing/selftests 
+        make ARCH=um -C tools/testing/selftests run_tests
 
-    #- name: KUnitTest
-     # run: |
-      #  ./tools/testing/kunit/kunit.py run
+    - name: KUnitTest
+      run: |
+        ./tools/testing/kunit/kunit.py run
 
     - name: CryptoTest
       run: |
