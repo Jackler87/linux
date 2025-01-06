@@ -26,10 +26,10 @@ jobs:
         make ARCH=um mrproper
         ./tools/testing/kunit/kunit.py config
 
-    # - name: selftests
-    #   run: |
-    #     make ARCH=um -C tools/testing/selftests 
-    #     make ARCH=um -C tools/testing/selftests run_tests
+    - name: selftests
+      run: |
+        make ARCH=um -C tools/testing/selftests 
+        make ARCH=um -C tools/testing/selftests run_tests
        
     - name: KUnitTest
       run: |
