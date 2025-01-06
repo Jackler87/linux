@@ -32,11 +32,9 @@ jobs:
     - name: KUnitTest
       run: |
         ./tools/testing/kunit/kunit.py run
-    - name: Set execute permissions for the test script
-      run: | 
-        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
-      
+        
     - name: CryptoTest
       run: |
+        chmod +x ./tools/testing/crypto/chacha20-s390/run-tests.sh
         ./tools/testing/crypto/chacha20-s390/run-tests.sh
   
