@@ -1,0 +1,28 @@
+name: kernel_test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+          
+    - name: Install dependencies
+      run: sudo apt install -y build-essential libncurses5-dev libssl-dev bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache dpkg-dev uml-utilities
+
+    - name: Clean and Prepare Build
+      run: |
+        make ARCH=um mrproper
+        ./tools/testing/kunit/kunit.py config
+        
+    - name: selftests
+      run: |
+        make ARCH=um -C tools/testing/selftests 
+        make ARCH=um -C tools/testing/selftests run_tests
+       
+    - name: KUnitTest
+      run: |
+        ./tools/testing/kunit/kunit.py run
