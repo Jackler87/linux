@@ -2,44 +2,72 @@ name: kernel_build
 
 on:
   push:
-    branches: master
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout source
+        uses: actions/checkout@v3
 
-    - name: Cache ccache
-      uses: actions/cache@v2
-      with:
-        path: ~/.ccache
-        key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
-        restore-keys: |
-          ${{ runner.os }}-ccache-
+      - name: Ensure ccache directory exists
+        run: mkdir -p ~/.ccache
 
-    - name: Install dependencies
-      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
 
-    - name: Configure ccache
-      run: |
-        ccache -M 5G
-        export CC="ccache gcc"
+      - name: Install dependencies
+        run: sudo apt-get install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
 
-    - name: Build kernel
-      run: |
-        make defconfig
-        make -j$(nproc)
+      - name: Configure ccache
+        run: |
+          ccache -M 5G
+          export CC="ccache gcc"
 
-    - name: Verify build outputs
-      run: ls -R arch/x86/boot
+      - name: Build kernel
+        run: |
+          make defconfig
+          make -j$(nproc)
 
-    - name: Upload compiled kernel artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: kernel-artifacts
-        path: |
-          arch/x86/boot/bzImage
-          System.map
-          vmlinux
+      - name: Verify build outputs
+        run: |
+          ls -R arch/x86/boot
+
+      - name: Copy kernel files to staging directory
+        run: |
+          sleep 10
+          mkdir -p release
+          cp arch/x86/boot/bzImage release/vmlinuz
+          cp System.map release/System.map
+          cp vmlinux release/vmlinux
+
+      - name: Package kernel files
+        run: |
+          tar -czf kernel-files.tar.gz -C release .
+
+      - name: Upload compiled kernel artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel-artifacts
+          path: kernel-files.tar.gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: 'v${{ github.run_number }}'
+          release_name: 'Release ${{ github.run_number }}'
+          body: 'Automated release for build ${{ github.run_number }}.'
+          draft: false
+          prerelease: false
+          files: kernel-files.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
