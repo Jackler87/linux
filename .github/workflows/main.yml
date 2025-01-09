@@ -6,13 +6,13 @@ on:
 
 jobs:
   kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Cache ccache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.ccache
         key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
@@ -20,7 +20,7 @@ jobs:
           ${{ runner.os }}-ccache-
 
     - name: Install dependencies
-      run: sudo apt install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
+      run: sudo apt-get install -y bc binutils bison dwarves flex gcc git gnupg2 gzip libelf-dev libncurses5-dev libssl-dev make openssl pahole perl-base rsync tar xz-utils ccache
 
     - name: Configure ccache
       run: |
@@ -38,7 +38,7 @@ jobs:
 
     - name: Copy kernel files to staging directory
       run: |
-        sleep(10)
+        sleep 10
         mkdir -p release
         cp arch/x86/boot/bzImage release/vmlinuz
         cp System.map release/System.map
@@ -49,17 +49,15 @@ jobs:
         tar -czf kernel-files.tar.gz -C release .
 
     - name: Upload compiled kernel artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kernel-artifacts
         path: kernel-files.tar.gz
 
-    - name: GitHub Release
-      uses: softprops/action-gh-release@v1
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: kernel-files.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SOURCE_NAME: ${{ steps.extract_names.outputs.SOURCE_NAME }}
-        SOURCE_BRANCH: ${{ steps.extract_names.outputs.SOURCE_BRANCH }}
-        SOURCE_TAG: v${{ github.run_number }}
-      with:
-        files: ./kernel.files.tar.gz
