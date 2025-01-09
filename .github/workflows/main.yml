@@ -2,6 +2,8 @@ name: kernel_build
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -52,7 +54,7 @@ jobs:
           tar -czf kernel-files.tar.gz -C release .
 
       - name: Upload compiled kernel artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kernel-artifacts
           path: kernel-files.tar.gz
