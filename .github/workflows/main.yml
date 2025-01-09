@@ -39,17 +39,22 @@ jobs:
         run: |
           ls -R arch/x86/boot
 
+      - name: Determine Kernel Release Version
+        id: kernel_version
+        run: |
+          echo "KERNELRELEASE=$(make kernelrelease)" >> $GITHUB_ENV
+
       - name: Copy kernel files to staging directory
         run: |
           sleep 10
           mkdir -p release
-          cp arch/x86/boot/bzImage release/vmlinuz
-          cp System.map release/System.map
-          cp vmlinux release/vmlinux
+          cp arch/x86/boot/bzImage release/vmlinuz-${{ env.KERNELRELEASE }}
+          cp System.map release/System.map-${{ env.KERNELRELEASE }}
+          cp vmlinux release/vmlinux-${{ env.KERNELRELEASE }}
 
       - name: Package kernel files
         run: |
-          tar -czf kernel-files.tar.gz -C release .
+          tar -czf kernel-files-${{ env.KERNELRELEASE }}.tar.gz -C release .
 
       - name: Upload compiled kernel artifacts
         uses: actions/upload-artifact@v4
