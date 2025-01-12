@@ -9,16 +9,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Ensure ccache directory exists
         run: mkdir -p ~/.ccache
 
-      - name: Cache ccache
-        uses: actions/cache@v3
+      - name: Set up ccache
+        uses: actions/cache@v4
         with:
           path: ~/.ccache
-          key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.c', '**/*.h') }}
           restore-keys: |
             ${{ runner.os }}-ccache-
 
@@ -70,6 +70,6 @@ jobs:
           body: 'Automated release for build ${{ github.run_number }}.'
           draft: false
           prerelease: false
-          files: kernel-files.tar.gz
+          files: kernel-files-${{ env.KERNELRELEASE }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
