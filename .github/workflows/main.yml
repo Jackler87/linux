@@ -60,7 +60,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kernel-artifacts
-          path: kernel-files.tar.gz
+          path: |
+            kernel-files-${{ env.KERNELRELEASE }}.tar.gz
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
