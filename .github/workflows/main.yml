@@ -56,7 +56,7 @@ jobs:
           
       - name: Create Initrd
         run: |
-          sudo update-initramfs -c -k $(make kernelrelease)
+          sudo update-initramfs -c -k ${{ env.KERNELRELEASE }}
           mkdir -p release
 
       - name: Copy kernel files to staging directory
