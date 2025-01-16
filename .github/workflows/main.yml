@@ -35,6 +35,14 @@ jobs:
           make defconfig
           make -j$(nproc)
 
+      - name: Build kernel modules
+        run: make modules
+        
+      - name: Install kernel modules
+        run: |
+          mkdir -p release/modules
+          make INSTALL_MOD_PATH=$(pwd)/release/modules modules_install        
+
       - name: Verify build outputs
         run: |
           ls -R arch/x86/boot
@@ -62,6 +70,10 @@ jobs:
       - name: Package kernel files
         run: |
           tar -czf kernel-files-${{ env.KERNELRELEASE }}.tar.gz -C release .
+          
+      - name: Package kernel modules
+        run: |
+          tar -czf kernel-modules-${{ env.KERNELRELEASE }}.tar.gz -C release/modules .
 
       - name: Upload compiled kernel artifacts
         uses: actions/upload-artifact@v4
@@ -69,6 +81,7 @@ jobs:
           name: kernel-artifacts
           path: |
             kernel-files-${{ env.KERNELRELEASE }}.tar.gz
+            kernel-modules-${{ env.KERNELRELEASE }}.tar.gz
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -78,6 +91,8 @@ jobs:
           body: 'Automated release for build ${{ github.run_number }}.'
           draft: false
           prerelease: false
-          files: kernel-files-${{ env.KERNELRELEASE }}.tar.gz
+          files: |
+            kernel-files-${{ env.KERNELRELEASE }}.tar.gz
+            kernel-modules-${{ env.KERNELRELEASE }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
