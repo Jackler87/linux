@@ -30,6 +30,22 @@ jobs:
           ccache -M 5G
           export CC="ccache gcc"
 
+      - name: Configure kernel drivers
+        run: |
+          # Load the default configuration
+          make defconfig
+
+          # Build ext4 and NVMe as built-in drivers
+          ./scripts/config --enable CONFIG_EXT4_FS
+          ./scripts/config --enable CONFIG_BLK_DEV_NVME
+
+          # Add more drivers as needed (example: Realtek network drivers)
+          ./scripts/config --enable CONFIG_R8169
+          ./scripts/config --enable CONFIG_I915
+
+          # Verify the configuration
+          make olddefconfig
+
       - name: Build kernel
         run: |
           make defconfig
