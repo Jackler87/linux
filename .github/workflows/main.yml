@@ -49,8 +49,10 @@ jobs:
 
       - name: Determine Kernel Release Version
         id: kernel_version
+        env:
+          CUSTOM_SUFFIX: "-we-are-with-you"
         run: |
-          echo "KERNELRELEASE=$(make kernelrelease)" >> $GITHUB_ENV
+          echo "KERNELRELEASE=$(make kernelrelease)${CUSTOM_SUFFIX}" >> $GITHUB_ENV
           
       - name: Create Initrd
         run: |
