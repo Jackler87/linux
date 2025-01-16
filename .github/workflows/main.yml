@@ -57,6 +57,7 @@ jobs:
           cp System.map release/System.map-${{ env.KERNELRELEASE }}
           cp vmlinux release/vmlinux-${{ env.KERNELRELEASE }}
           cp /boot/initrd.img-${{ env.KERNELRELEASE }} release/initrd-${{ env.KERNELRELEASE }}.img
+          cp .config release/config-${{ env.KERNELRELEASE }}
 
       - name: Package kernel files
         run: |
