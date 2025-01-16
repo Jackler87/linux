@@ -39,16 +39,16 @@ jobs:
         run: |
           ls -R arch/x86/boot
 
-      - name: Create Initrd
-        run: |
-          sudo update-initramfs -c -k $(make kernelrelease)
-          mkdir -p release
-          cp /boot/initrd.img-$(make kernelrelease) release/initrd.img
-
       - name: Determine Kernel Release Version
         id: kernel_version
         run: |
           echo "KERNELRELEASE=$(make kernelrelease)" >> $GITHUB_ENV
+          
+      - name: Create Initrd
+        run: |
+          sudo update-initramfs -c -k $(make kernelrelease)
+          mkdir -p release
+          cp /boot/initrd.img-$(make kernelrelease) release/initrd-${{ env.KERNELRELEASE }}.img
 
       - name: Copy kernel files to staging directory
         run: |
