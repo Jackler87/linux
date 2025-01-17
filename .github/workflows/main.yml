@@ -53,7 +53,7 @@ jobs:
 
       - name: Build kernel modules
         run: make modules
-        
+
       - name: Install kernel modules
         run: |
           mkdir -p release/modules
@@ -69,11 +69,12 @@ jobs:
           CUSTOM_SUFFIX: "-we-are-with-you"
         run: |
           echo "KERNELRELEASE=$(make kernelrelease)${CUSTOM_SUFFIX}" >> $GITHUB_ENV
-          
+          echo "Kernel release version: ${{ env.KERNELRELEASE }}"
+
       - name: Create Initrd
         run: |
-          sudo update-initramfs -c -k ${{ env.KERNELRELEASE }}
-          mkdir -p release
+          sudo update-initramfs -c -k $(make kernelrelease)
+          sudo mv /boot/initrd.img-$(make kernelrelease) /boot/initrd.img-${{ env.KERNELRELEASE }}.img
 
       - name: Copy kernel files to staging directory
         run: |
@@ -82,13 +83,13 @@ jobs:
           cp arch/x86/boot/bzImage release/vmlinuz-${{ env.KERNELRELEASE }}
           cp System.map release/System.map-${{ env.KERNELRELEASE }}
           cp vmlinux release/vmlinux-${{ env.KERNELRELEASE }}
-          cp /boot/initrd.img-${{ env.KERNELRELEASE }} release/initrd-${{ env.KERNELRELEASE }}.img
+          cp /boot/initrd.img-${{ env.KERNELRELEASE }}.img release/
           cp .config release/config-${{ env.KERNELRELEASE }}
 
       - name: Package kernel files
         run: |
           tar -czf kernel-files-${{ env.KERNELRELEASE }}.tar.gz -C release .
-          
+
       - name: Package kernel modules
         run: |
           tar -czf kernel-modules-${{ env.KERNELRELEASE }}.tar.gz -C release/modules .
